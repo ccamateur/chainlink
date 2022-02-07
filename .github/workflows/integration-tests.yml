@@ -20,6 +20,10 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
       - name: Build and Push
         uses: docker/build-push-action@v2
         with:
@@ -98,9 +102,11 @@ jobs:
 
   solana:
     name: Solana Tests
-    uses: smartcontractkit/chainlink-solana/.github/workflows/e2e.yml@develop
+    uses: smartcontractkit/chainlink-solana/.github/workflows/e2e.yml@chainlink_main_pipeline
     with:
       repo_name: smartcontractkit/chainlink-solana
+      cl_repo: 795953128386.dkr.ecr.us-west-2.amazonaws.com/chainlink
+      cl_image: latest.${{ github.sha }}
     secrets:
       QA_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       QA_AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
